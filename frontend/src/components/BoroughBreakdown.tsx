@@ -62,11 +62,12 @@ export function BoroughBreakdown({ days = 90 }: BoroughBreakdownProps) {
                     tickFormatter={(v) => v.slice(0, 3)}
                   />
                   <YAxis 
-                    tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                    tickFormatter={(v) => v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v.toFixed(0)}`}
                     tick={{ fill: '#94a3b8', fontSize: 10 }}
                     axisLine={false}
                     tickLine={false}
                     width={45}
+                    allowDecimals={false}
                   />
                   <Tooltip
                     content={({ active, payload }) => {

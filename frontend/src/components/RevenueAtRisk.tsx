@@ -65,10 +65,11 @@ export function RevenueAtRisk({ days = 90 }: RevenueAtRiskProps) {
             <BarChart data={chartData} layout="vertical">
               <XAxis 
                 type="number" 
-                tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                tickFormatter={(v) => v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v.toFixed(0)}`}
                 tick={{ fill: '#94a3b8', fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
+                allowDecimals={false}
               />
               <YAxis 
                 type="category" 
