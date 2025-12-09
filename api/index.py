@@ -42,7 +42,8 @@ async def get_analytics_service():
     data_loader = DataLoader(settings.csv_path)
     _nyc_api = NYCInspectionAPI(
         settings.nyc_api_base_url,
-        settings.nyc_api_app_token,
+        settings.nyc_api_key_id,
+        settings.nyc_api_key_secret,
     )
     _matcher = RestaurantMatcher(settings.mapping_path)
     

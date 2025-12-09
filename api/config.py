@@ -13,9 +13,10 @@ class Settings(BaseSettings):
     app_name: str = "RatChallenge API"
     debug: bool = False
     
-    # NYC Open Data API - SODA API (no auth required)
+    # NYC Open Data API - SODA API with authentication
     nyc_api_base_url: str = "https://data.cityofnewyork.us/resource/43nn-pn8j.json"
-    nyc_api_app_token: str | None = None  # Optional, increases rate limit
+    nyc_api_key_id: str | None = None  # API Key ID for authentication
+    nyc_api_key_secret: str | None = None  # API Key Secret for authentication
     
     # Data paths (relative to api directory)
     csv_path: Path = Path(__file__).parent / "data" / "food_orders.csv"

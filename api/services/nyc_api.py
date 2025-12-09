@@ -13,31 +13,38 @@ class NYCInspectionAPI:
     """Client for NYC DOHMH Restaurant Inspection Results API using SODA API."""
     
     # SODA API pagination limit
-    BATCH_SIZE = 10000  # Smaller batches for serverless timeout limits
-    MAX_RECORDS = 200000  # Limit for serverless function timeout
+    BATCH_SIZE = 50000  # Larger batches with auth (higher rate limits)
+    MAX_RECORDS = 500000  # Higher limit with authentication
     
-    def __init__(self, base_url: str, app_token: str | None = None):
+    def __init__(
+        self,
+        base_url: str,
+        api_key_id: str | None = None,
+        api_key_secret: str | None = None,
+    ):
         """
         Initialize the NYC API client.
         
         Args:
             base_url: Base URL for the NYC Open Data SODA API
-            app_token: Optional Socrata app token for higher rate limits
+            api_key_id: API Key ID for Basic Auth
+            api_key_secret: API Key Secret for Basic Auth
         """
         self.base_url = base_url
-        self.app_token = app_token
+        self.api_key_id = api_key_id
+        self.api_key_secret = api_key_secret
         self._client: httpx.AsyncClient | None = None
     
     @property
     def client(self) -> httpx.AsyncClient:
         """Get or create the HTTP client."""
         if self._client is None:
-            headers = {}
-            if self.app_token:
-                headers["X-App-Token"] = self.app_token
+            auth = None
+            if self.api_key_id and self.api_key_secret:
+                auth = httpx.BasicAuth(self.api_key_id, self.api_key_secret)
             self._client = httpx.AsyncClient(
-                headers=headers,
-                timeout=httpx.Timeout(30.0, connect=10.0),
+                auth=auth,
+                timeout=httpx.Timeout(60.0, connect=10.0),
             )
         return self._client
     
