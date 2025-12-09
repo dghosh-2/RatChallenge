@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { api, formatCurrency, formatPercent, formatNumber } from '@/lib/api';
+import { api, formatCurrency, formatPercent, formatNumber, DateRangeDays } from '@/lib/api';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from 'recharts';
 
 const BOROUGH_COLORS: Record<string, string> = {
@@ -12,10 +12,14 @@ const BOROUGH_COLORS: Record<string, string> = {
   'STATEN ISLAND': '#db2777',
 };
 
-export function BoroughBreakdown() {
+interface BoroughBreakdownProps {
+  days?: DateRangeDays;
+}
+
+export function BoroughBreakdown({ days = 90 }: BoroughBreakdownProps) {
   const { data, isLoading } = useQuery({
-    queryKey: ['borough-breakdown'],
-    queryFn: api.getBoroughBreakdown,
+    queryKey: ['borough-breakdown', days],
+    queryFn: () => api.getBoroughBreakdown(days),
   });
 
   if (isLoading) {

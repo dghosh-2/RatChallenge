@@ -17,19 +17,20 @@ from config import get_settings
 from routers import health, analytics, report
 
 # Global state for caching data between requests (within same instance)
-_analytics_service = None
+# Cache by days parameter to avoid re-fetching for same time range
+_analytics_services: dict[int, any] = {}
 _orders_df = None
-_inspections_df = None
 _matcher = None
 _nyc_api = None
 
 
-async def get_analytics_service():
-    """Get or initialize the analytics service."""
-    global _analytics_service, _orders_df, _inspections_df, _matcher, _nyc_api
+async def get_analytics_service(days: int = 90):
+    """Get or initialize the analytics service for a specific time range."""
+    global _analytics_services, _orders_df, _matcher, _nyc_api
     
-    if _analytics_service is not None:
-        return _analytics_service
+    # Return cached service if available for this time range
+    if days in _analytics_services:
+        return _analytics_services[days]
     
     from services.data_loader import DataLoader
     from services.nyc_api import NYCInspectionAPI
@@ -38,25 +39,31 @@ async def get_analytics_service():
     
     settings = get_settings()
     
-    # Initialize services
-    data_loader = DataLoader(settings.csv_path)
-    _nyc_api = NYCInspectionAPI(
-        settings.nyc_api_base_url,
-        settings.nyc_api_key_id,
-        settings.nyc_api_key_secret,
-    )
-    _matcher = RestaurantMatcher(settings.mapping_path)
+    # Initialize shared services (only once)
+    if _orders_df is None:
+        data_loader = DataLoader(settings.csv_path)
+        _orders_df = data_loader.load_orders()
     
-    # Load data
-    _orders_df = data_loader.load_orders()
+    if _nyc_api is None:
+        _nyc_api = NYCInspectionAPI(
+            settings.nyc_api_base_url,
+            settings.nyc_api_key_id,
+            settings.nyc_api_key_secret,
+        )
     
-    # Fetch NYC inspection data directly from API (no caching)
-    _inspections_df = await _nyc_api.fetch_all_inspections()
+    if _matcher is None:
+        _matcher = RestaurantMatcher(settings.mapping_path)
     
-    # Initialize analytics service
-    _analytics_service = AnalyticsService(_orders_df, _inspections_df, _matcher)
+    # Fetch NYC inspection data for the specified time range
+    inspections_df = await _nyc_api.fetch_all_inspections(days=days)
     
-    return _analytics_service
+    # Initialize analytics service for this time range
+    analytics_service = AnalyticsService(_orders_df, inspections_df, _matcher)
+    
+    # Cache for future requests with same time range
+    _analytics_services[days] = analytics_service
+    
+    return analytics_service
 
 
 # Create FastAPI app

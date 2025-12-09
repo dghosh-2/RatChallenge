@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { api, formatCurrency, formatNumber } from '@/lib/api';
+import { api, formatCurrency, formatNumber, DateRangeDays } from '@/lib/api';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from 'recharts';
 
 const CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
@@ -11,10 +11,14 @@ const CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
   critical_violation: { label: 'Critical', color: '#b91c1c' },
 };
 
-export function RevenueAtRisk() {
+interface RevenueAtRiskProps {
+  days?: DateRangeDays;
+}
+
+export function RevenueAtRisk({ days = 90 }: RevenueAtRiskProps) {
   const { data, isLoading } = useQuery({
-    queryKey: ['revenue-at-risk'],
-    queryFn: api.getRevenueAtRisk,
+    queryKey: ['revenue-at-risk', days],
+    queryFn: () => api.getRevenueAtRisk(days),
   });
 
   if (isLoading) {

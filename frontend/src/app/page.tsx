@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { api, formatCurrency, formatNumber, formatPercent } from '@/lib/api';
+import { api, DateRangeDays } from '@/lib/api';
 import { Dashboard } from '@/components/Dashboard';
 import { RevenueByGrade } from '@/components/RevenueByGrade';
 import { RodentOrders } from '@/components/RodentOrders';
@@ -9,15 +10,23 @@ import { RevenueAtRisk } from '@/components/RevenueAtRisk';
 import { BoroughBreakdown } from '@/components/BoroughBreakdown';
 import { Watchlist } from '@/components/Watchlist';
 
+const DATE_RANGE_OPTIONS: { value: DateRangeDays; label: string }[] = [
+  { value: 7, label: '7 Days' },
+  { value: 30, label: '30 Days' },
+  { value: 90, label: '90 Days' },
+];
+
 export default function Home() {
+  const [dateRange, setDateRange] = useState<DateRangeDays>(90);
+
   const { data: summary, isLoading, error } = useQuery({
-    queryKey: ['summary'],
-    queryFn: api.getSummary,
+    queryKey: ['summary', dateRange],
+    queryFn: () => api.getSummary(dateRange),
   });
 
   const handleDownloadPdf = async () => {
     try {
-      await api.downloadPdf();
+      await api.downloadPdf(dateRange);
     } catch (err) {
       console.error('Failed to download PDF:', err);
     }
@@ -49,16 +58,34 @@ export default function Home() {
               <h1 className="text-lg font-semibold text-slate-800">Food Safety Analytics</h1>
               <p className="text-xs text-slate-400">NYC Restaurant Risk Dashboard</p>
             </div>
-            <button
-              onClick={handleDownloadPdf}
-              className="btn btn-primary flex items-center gap-2"
-              disabled={isLoading}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              Download Report
-            </button>
+            <div className="flex items-center gap-4">
+              {/* Date Range Tabs */}
+              <div className="flex bg-slate-100 rounded-lg p-1">
+                {DATE_RANGE_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setDateRange(option.value)}
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
+                      dateRange === option.value
+                        ? 'bg-white text-slate-800 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={handleDownloadPdf}
+                className="btn btn-primary flex items-center gap-2"
+                disabled={isLoading}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Download Report
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -75,20 +102,20 @@ export default function Home() {
             {/* Main Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Rodent Analysis */}
-              <RodentOrders />
+              <RodentOrders days={dateRange} />
               
               {/* Revenue by Grade */}
-              <RevenueByGrade />
+              <RevenueByGrade days={dateRange} />
               
               {/* Revenue at Risk */}
-              <RevenueAtRisk />
+              <RevenueAtRisk days={dateRange} />
               
               {/* Borough Breakdown */}
-              <BoroughBreakdown />
+              <BoroughBreakdown days={dateRange} />
             </div>
             
             {/* Watchlist - Full Width */}
-            <Watchlist />
+            <Watchlist days={dateRange} />
           </div>
         ) : null}
       </div>

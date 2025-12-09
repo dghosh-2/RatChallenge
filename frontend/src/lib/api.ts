@@ -2,11 +2,11 @@
  * API client for RatChallenge backend
  */
 
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-
 // Use environment variable in production, fallback to /api for development
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
+
+// Supported date ranges
+export type DateRangeDays = 7 | 30 | 90;
 
 export interface HealthResponse {
   status: string;
@@ -118,24 +118,30 @@ async function fetchApi<T>(endpoint: string): Promise<T> {
 }
 
 export const api = {
-  getHealth: () => fetchApi<HealthResponse>('/health'),
+  getHealth: (days: DateRangeDays = 90) => 
+    fetchApi<HealthResponse>(`/health?days=${days}`),
   
-  getSummary: () => fetchApi<SummaryResponse>('/analytics/summary'),
+  getSummary: (days: DateRangeDays = 90) => 
+    fetchApi<SummaryResponse>(`/analytics/summary?days=${days}`),
   
-  getRodentOrders: () => fetchApi<RodentOrdersResponse>('/analytics/rodent-orders'),
+  getRodentOrders: (days: DateRangeDays = 90) => 
+    fetchApi<RodentOrdersResponse>(`/analytics/rodent-orders?days=${days}`),
   
-  getRevenueByGrade: () => fetchApi<RevenueByGradeResponse>('/analytics/revenue-by-grade'),
+  getRevenueByGrade: (days: DateRangeDays = 90) => 
+    fetchApi<RevenueByGradeResponse>(`/analytics/revenue-by-grade?days=${days}`),
   
-  getRevenueAtRisk: () => fetchApi<RevenueAtRiskResponse>('/analytics/revenue-at-risk'),
+  getRevenueAtRisk: (days: DateRangeDays = 90) => 
+    fetchApi<RevenueAtRiskResponse>(`/analytics/revenue-at-risk?days=${days}`),
   
-  getBoroughBreakdown: () => fetchApi<BoroughBreakdownResponse>('/analytics/borough-breakdown'),
+  getBoroughBreakdown: (days: DateRangeDays = 90) => 
+    fetchApi<BoroughBreakdownResponse>(`/analytics/borough-breakdown?days=${days}`),
   
-  getWatchlist: (topN: number = 10) => 
-    fetchApi<WatchlistResponse>(`/analytics/watchlist?top_n=${topN}`),
+  getWatchlist: (days: DateRangeDays = 90, topN: number = 10) => 
+    fetchApi<WatchlistResponse>(`/analytics/watchlist?days=${days}&top_n=${topN}`),
   
-  downloadPdf: async () => {
+  downloadPdf: async (days: DateRangeDays = 90) => {
     try {
-      const response = await fetch(`${API_BASE}/report/pdf`);
+      const response = await fetch(`${API_BASE}/report/pdf?days=${days}`);
       if (!response.ok) {
         const errorBody = await response.text();
         let errorMessage = 'Failed to download PDF';

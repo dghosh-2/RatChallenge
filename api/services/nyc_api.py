@@ -1,6 +1,7 @@
 """NYC Restaurant Inspection API client - Direct API calls, no caching."""
 
 import logging
+from datetime import datetime, timedelta
 from typing import Any
 
 import httpx
@@ -98,11 +99,12 @@ class NYCInspectionAPI:
             logger.error(f"Request error fetching inspections: {e}")
             raise
     
-    async def fetch_all_inspections(self) -> pd.DataFrame:
+    async def fetch_all_inspections(self, days: int = 90) -> pd.DataFrame:
         """
-        Fetch inspection records with pagination.
-        No caching - calls API directly every time.
-        Limited to avoid serverless timeout.
+        Fetch inspection records from the last N days with pagination.
+        
+        Args:
+            days: Number of days to look back (default 90)
         
         Returns:
             DataFrame with inspection records
@@ -110,13 +112,18 @@ class NYCInspectionAPI:
         all_records: list[dict[str, Any]] = []
         offset = 0
         
-        logger.info("Starting to fetch NYC inspection data from SODA API...")
+        # Calculate date filter for last N days
+        cutoff_date = datetime.now() - timedelta(days=days)
+        date_filter = f"inspection_date >= '{cutoff_date.strftime('%Y-%m-%dT00:00:00')}'"
+        
+        logger.info(f"Fetching NYC inspection data from last {days} days (since {cutoff_date.date()})...")
         
         while offset < self.MAX_RECORDS:
             try:
                 batch = await self.fetch_inspections(
                     limit=self.BATCH_SIZE,
                     offset=offset,
+                    where=date_filter,
                 )
                 
                 if not batch:

@@ -1,12 +1,16 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { api, formatCurrency, formatNumber } from '@/lib/api';
+import { api, formatCurrency, formatNumber, DateRangeDays } from '@/lib/api';
 
-export function RodentOrders() {
+interface RodentOrdersProps {
+  days?: DateRangeDays;
+}
+
+export function RodentOrders({ days = 90 }: RodentOrdersProps) {
   const { data, isLoading } = useQuery({
-    queryKey: ['rodent-orders'],
-    queryFn: api.getRodentOrders,
+    queryKey: ['rodent-orders', days],
+    queryFn: () => api.getRodentOrders(days),
   });
 
   if (isLoading) {

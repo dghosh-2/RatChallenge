@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { api, formatCurrency, formatPercent } from '@/lib/api';
+import { api, formatCurrency, formatPercent, DateRangeDays } from '@/lib/api';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 const GRADE_COLORS: Record<string, string> = {
@@ -22,10 +22,14 @@ const GRADE_LABELS: Record<string, string> = {
   N: 'Not Yet Graded',
 };
 
-export function RevenueByGrade() {
+interface RevenueByGradeProps {
+  days?: DateRangeDays;
+}
+
+export function RevenueByGrade({ days = 90 }: RevenueByGradeProps) {
   const { data, isLoading } = useQuery({
-    queryKey: ['revenue-by-grade'],
-    queryFn: api.getRevenueByGrade,
+    queryKey: ['revenue-by-grade', days],
+    queryFn: () => api.getRevenueByGrade(days),
   });
 
   if (isLoading) {

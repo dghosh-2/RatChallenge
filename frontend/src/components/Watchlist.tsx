@@ -1,12 +1,16 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { api, formatCurrency, formatNumber } from '@/lib/api';
+import { api, formatCurrency, DateRangeDays } from '@/lib/api';
 
-export function Watchlist() {
+interface WatchlistProps {
+  days?: DateRangeDays;
+}
+
+export function Watchlist({ days = 90 }: WatchlistProps) {
   const { data, isLoading } = useQuery({
-    queryKey: ['watchlist'],
-    queryFn: () => api.getWatchlist(10),
+    queryKey: ['watchlist', days],
+    queryFn: () => api.getWatchlist(days, 10),
   });
 
   if (isLoading) {
