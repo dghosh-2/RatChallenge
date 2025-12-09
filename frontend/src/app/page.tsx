@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { api, DateRangeDays } from '@/lib/api';
+import { api } from '@/lib/api';
 import { Dashboard } from '@/components/Dashboard';
 import { RevenueByGrade } from '@/components/RevenueByGrade';
 import { RodentOrders } from '@/components/RodentOrders';
@@ -10,14 +9,8 @@ import { RevenueAtRisk } from '@/components/RevenueAtRisk';
 import { BoroughBreakdown } from '@/components/BoroughBreakdown';
 import { Watchlist } from '@/components/Watchlist';
 
-const DATE_RANGE_OPTIONS: { value: DateRangeDays; label: string }[] = [
-  { value: 7, label: '7 Days' },
-  { value: 30, label: '30 Days' },
-  { value: 90, label: '90 Days' },
-];
-
 export default function Home() {
-  const [dateRange, setDateRange] = useState<DateRangeDays>(90);
+  const dateRange = 90;
 
   const { data: summary, isLoading, error } = useQuery({
     queryKey: ['summary', dateRange],
@@ -59,22 +52,6 @@ export default function Home() {
               <p className="text-xs text-slate-400">NYC Restaurant Risk Dashboard</p>
             </div>
             <div className="flex items-center gap-4">
-              {/* Date Range Tabs */}
-              <div className="flex bg-slate-100 rounded-lg p-1">
-                {DATE_RANGE_OPTIONS.map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => setDateRange(option.value)}
-                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
-                      dateRange === option.value
-                        ? 'bg-white text-slate-800 shadow-sm'
-                        : 'text-slate-500 hover:text-slate-700'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
               <button
                 onClick={handleDownloadPdf}
                 className="btn btn-primary flex items-center gap-2"
