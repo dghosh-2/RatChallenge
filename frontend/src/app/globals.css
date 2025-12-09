@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground: #334155;
+  --background: #f8fafc;
+  --card-bg: #ffffff;
+  --muted: #64748b;
+  --muted-light: #94a3b8;
+  --border: #e2e8f0;
+  --accent: #0f766e;
+  --accent-light: #14b8a6;
+  --danger: #dc2626;
+  --danger-light: #fef2f2;
+  --warning: #d97706;
+  --warning-light: #fffbeb;
+  --success: #059669;
+  --success-light: #ecfdf5;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-light);
+}
+
+/* Card styles */
+.card {
+  @apply bg-white rounded-lg shadow-sm;
+}
+
+/* Stat card */
+.stat-card {
+  @apply card p-6;
+}
+
+/* Table styles */
+.data-table {
+  @apply w-full text-sm;
+}
+
+.data-table th {
+  @apply px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50;
+}
+
+.data-table td {
+  @apply px-4 py-3;
+}
+
+.data-table tbody tr {
+  @apply border-t border-slate-100;
+}
+
+.data-table tr:hover td {
+  @apply bg-slate-50;
+}
+
+/* Badge styles */
+.badge {
+  @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium;
+}
+
+.badge-danger {
+  @apply bg-red-50 text-red-700;
+}
+
+.badge-warning {
+  @apply bg-amber-50 text-amber-700;
+}
+
+.badge-success {
+  @apply bg-emerald-50 text-emerald-700;
+}
+
+.badge-info {
+  @apply bg-slate-100 text-slate-600;
+}
+
+/* Button styles */
+.btn {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors duration-150;
+}
+
+.btn-primary {
+  @apply bg-teal-600 hover:bg-teal-700 text-white;
+}
+
+.btn-danger {
+  @apply bg-red-600 hover:bg-red-700 text-white;
+}
+
+.btn-outline {
+  @apply border border-slate-200 hover:bg-slate-50 text-slate-600;
+}
+
+/* Loading animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f1f5f9 25%,
+    #e2e8f0 50%,
+    #f1f5f9 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}

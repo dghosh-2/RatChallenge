@@ -1,0 +1,58 @@
+# Cursor Rules for RatChallenge Project
+
+## Project Overview
+Food delivery risk analysis application combining internal order data with NYC Restaurant Inspection Results.
+
+## Tech Stack
+- **Backend**: Python 3.11+, FastAPI, Pandas, httpx, reportlab
+- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS, Recharts
+
+## Code Style
+
+### Python (Backend)
+- Use type hints for all function parameters and return values
+- Follow PEP 8 naming conventions (snake_case for functions/variables, PascalCase for classes)
+- Use Pydantic models for all API request/response schemas
+- Async functions for all I/O operations (API calls, file reads)
+- Docstrings for all public functions and classes (Google style)
+- Keep functions focused and under 50 lines
+- Use `httpx` for async HTTP requests, not `requests`
+- Handle exceptions explicitly with custom error types
+
+### TypeScript (Frontend)
+- Use TypeScript strict mode
+- Prefer `interface` over `type` for object shapes
+- Use named exports, not default exports
+- Component files: PascalCase (e.g., `Dashboard.tsx`)
+- Utility files: camelCase (e.g., `api.ts`)
+- Use React Query for server state management
+- Tailwind CSS for styling - no inline styles or CSS modules
+
+### API Design
+- RESTful endpoints under `/api/`
+- Use HTTP status codes correctly (200, 400, 404, 500)
+- Return consistent JSON response shapes
+- Include error messages in response body
+
+### File Organization
+- One component per file
+- Group related functionality in directories
+- Keep imports organized: stdlib, third-party, local
+
+## Data Handling
+- All monetary values as floats with 2 decimal precision
+- Restaurant names normalized before matching (lowercase, strip suffixes)
+- CAMIS IDs stored as strings (leading zeros matter)
+- Dates in ISO 8601 format
+
+## Testing
+- Write unit tests for business logic
+- Test edge cases for data matching
+- Mock external API calls in tests
+
+## Documentation
+- README with setup instructions
+- Inline comments for complex logic
+- API endpoints documented with OpenAPI/Swagger
+
+
