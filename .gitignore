@@ -28,5 +28,7 @@ frontend/out/
 .DS_Store
 Thumbs.db
 
-# Cache files (keep api/data/inspections_cache.parquet for deployment)
+# Cache files (using Vercel Blob instead)
 backend/data/inspections_cache.parquet
+api/data/inspections_cache.parquet
+*.parquet
