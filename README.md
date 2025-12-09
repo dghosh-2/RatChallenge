@@ -8,4 +8,4 @@ Is there a rat in my food? A full-stack application that combines food delivery 
 The application has been deployed thorugh vercel and is accessible at: [https://rat-challenge.vercel.app](https://rat-challenge.vercel.app)
 To use the app, simply open the link above in your browser.
 
-Please note the PDF download feature requires browser permissions to be enabled for downloads from Vercel. 
+Please note the PDF download feature requires browser permissions to be enabled for downloads from Vercel. Also please note that the download may take a few seconds to render.
