@@ -49,8 +49,8 @@ async def get_analytics_service():
     # Load data
     _orders_df = data_loader.load_orders()
     
-    # Fetch NYC inspection data (will use Vercel Blob cache if available)
-    _inspections_df = await _nyc_api.fetch_all_inspections(use_cache=True)
+    # Fetch NYC inspection data directly from API (no caching)
+    _inspections_df = await _nyc_api.fetch_all_inspections()
     
     # Initialize analytics service
     _analytics_service = AnalyticsService(_orders_df, _inspections_df, _matcher)

@@ -13,16 +13,13 @@ class Settings(BaseSettings):
     app_name: str = "RatChallenge API"
     debug: bool = False
     
-    # NYC Open Data API
-    nyc_api_base_url: str = "https://data.cityofnewyork.us/resource/43nn-pn8j.json"
+    # NYC Open Data API - Query API v3
+    nyc_api_base_url: str = "https://data.cityofnewyork.us/api/v3/views/43nn-pn8j/query.json"
     nyc_api_app_token: str | None = None  # Optional, increases rate limit
     
     # Data paths (relative to api directory)
     csv_path: Path = Path(__file__).parent / "data" / "food_orders.csv"
     mapping_path: Path = Path(__file__).parent / "data" / "restaurant_mapping.json"
-    
-    # Cache settings (using Vercel Blob, not local file)
-    cache_max_age_days: int = 7  # Refresh cache if older than this
     
     # CORS - can be overridden via CORS_ORIGINS env var (comma-separated)
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
