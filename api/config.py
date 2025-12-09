@@ -13,8 +13,8 @@ class Settings(BaseSettings):
     app_name: str = "RatChallenge API"
     debug: bool = False
     
-    # NYC Open Data API - Query API v3
-    nyc_api_base_url: str = "https://data.cityofnewyork.us/api/v3/views/43nn-pn8j/query.json"
+    # NYC Open Data API - SODA API (no auth required)
+    nyc_api_base_url: str = "https://data.cityofnewyork.us/resource/43nn-pn8j.json"
     nyc_api_app_token: str | None = None  # Optional, increases rate limit
     
     # Data paths (relative to api directory)

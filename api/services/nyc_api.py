@@ -10,18 +10,18 @@ logger = logging.getLogger(__name__)
 
 
 class NYCInspectionAPI:
-    """Client for NYC DOHMH Restaurant Inspection Results API using Query API v3."""
+    """Client for NYC DOHMH Restaurant Inspection Results API using SODA API."""
     
-    # Query API v3 pagination limit
-    BATCH_SIZE = 50000
-    MAX_RECORDS = 500000  # Safety limit
+    # SODA API pagination limit
+    BATCH_SIZE = 10000  # Smaller batches for serverless timeout limits
+    MAX_RECORDS = 200000  # Limit for serverless function timeout
     
     def __init__(self, base_url: str, app_token: str | None = None):
         """
         Initialize the NYC API client.
         
         Args:
-            base_url: Base URL for the NYC Open Data Query API v3
+            base_url: Base URL for the NYC Open Data SODA API
             app_token: Optional Socrata app token for higher rate limits
         """
         self.base_url = base_url
@@ -37,7 +37,7 @@ class NYCInspectionAPI:
                 headers["X-App-Token"] = self.app_token
             self._client = httpx.AsyncClient(
                 headers=headers,
-                timeout=httpx.Timeout(60.0, connect=10.0),
+                timeout=httpx.Timeout(30.0, connect=10.0),
             )
         return self._client
     
@@ -49,12 +49,12 @@ class NYCInspectionAPI:
     
     async def fetch_inspections(
         self,
-        limit: int = 50000,
+        limit: int = 10000,
         offset: int = 0,
         where: str | None = None,
     ) -> list[dict[str, Any]]:
         """
-        Fetch inspection records from the Query API v3.
+        Fetch inspection records from the SODA API.
         
         Args:
             limit: Maximum number of records to fetch
@@ -78,21 +78,10 @@ class NYCInspectionAPI:
             response.raise_for_status()
             data = response.json()
             
-            # Query API v3 returns data in a different format
-            # Check if it's wrapped in a 'data' or 'results' key
-            if isinstance(data, dict):
-                if "data" in data:
-                    return data["data"]
-                elif "results" in data:
-                    return data["results"]
-                elif "rows" in data:
-                    return data["rows"]
-            
-            # If it's already a list, return it
+            # SODA API returns a list directly
             if isinstance(data, list):
                 return data
             
-            # Fallback: try to extract records
             logger.warning(f"Unexpected API response format: {type(data)}")
             return []
         except httpx.HTTPStatusError as e:
@@ -104,33 +93,38 @@ class NYCInspectionAPI:
     
     async def fetch_all_inspections(self) -> pd.DataFrame:
         """
-        Fetch all inspection records with pagination.
+        Fetch inspection records with pagination.
         No caching - calls API directly every time.
+        Limited to avoid serverless timeout.
         
         Returns:
-            DataFrame with all inspection records
+            DataFrame with inspection records
         """
         all_records: list[dict[str, Any]] = []
         offset = 0
         
-        logger.info("Starting to fetch NYC inspection data from Query API v3...")
+        logger.info("Starting to fetch NYC inspection data from SODA API...")
         
         while offset < self.MAX_RECORDS:
-            batch = await self.fetch_inspections(
-                limit=self.BATCH_SIZE,
-                offset=offset,
-            )
-            
-            if not batch:
+            try:
+                batch = await self.fetch_inspections(
+                    limit=self.BATCH_SIZE,
+                    offset=offset,
+                )
+                
+                if not batch:
+                    break
+                
+                all_records.extend(batch)
+                logger.info(f"Fetched {len(all_records)} records so far...")
+                
+                if len(batch) < self.BATCH_SIZE:
+                    break
+                
+                offset += self.BATCH_SIZE
+            except Exception as e:
+                logger.error(f"Error fetching batch at offset {offset}: {e}")
                 break
-            
-            all_records.extend(batch)
-            logger.info(f"Fetched {len(all_records)} records so far...")
-            
-            if len(batch) < self.BATCH_SIZE:
-                break
-            
-            offset += self.BATCH_SIZE
         
         logger.info(f"Total inspection records fetched: {len(all_records)}")
         
