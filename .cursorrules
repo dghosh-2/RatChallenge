@@ -54,5 +54,6 @@ Food delivery risk analysis application combining internal order data with NYC R
 - README with setup instructions
 - Inline comments for complex logic
 - API endpoints documented with OpenAPI/Swagger
+- DO NOT create markdown documentation files unless explicitly requested by the user
 
 

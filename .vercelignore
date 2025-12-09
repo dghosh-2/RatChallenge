@@ -1,0 +1,17 @@
+# Exclude backend directory from Vercel deployment
+backend/
+
+# Exclude root node_modules
+node_modules/
+
+# Exclude any parquet files
+*.parquet
+
+# Exclude Python virtual environments
+**/venv/
+**/__pycache__/
+
+# Exclude IDE files
+.idea/
+.vscode/
+
